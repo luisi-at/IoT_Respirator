@@ -15,6 +15,10 @@
 		F8A17372229EE79A0085102B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F8A17370229EE79A0085102B /* LaunchScreen.storyboard */; };
 		F8A1737D229EE79A0085102B /* IoT_RespiratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1737C229EE79A0085102B /* IoT_RespiratorTests.swift */; };
 		F8A17388229EE79A0085102B /* IoT_RespiratorUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A17387229EE79A0085102B /* IoT_RespiratorUITests.swift */; };
+		F8A17396229EE89F0085102B /* ThirdViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A17395229EE89F0085102B /* ThirdViewController.swift */; };
+		F8A17398229F056A0085102B /* BLEManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A17397229F056A0085102B /* BLEManager.swift */; };
+		F8A1739A229F17A40085102B /* BLECentral.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A17399229F17A40085102B /* BLECentral.swift */; };
+		F8A1739C229FF80A0085102B /* ReadingPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1739B229FF80A0085102B /* ReadingPacket.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +53,10 @@
 		F8A17383229EE79A0085102B /* IoT_RespiratorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IoT_RespiratorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8A17387229EE79A0085102B /* IoT_RespiratorUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IoT_RespiratorUITests.swift; sourceTree = "<group>"; };
 		F8A17389229EE79A0085102B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F8A17395229EE89F0085102B /* ThirdViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdViewController.swift; sourceTree = "<group>"; };
+		F8A17397229F056A0085102B /* BLEManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEManager.swift; sourceTree = "<group>"; };
+		F8A17399229F17A40085102B /* BLECentral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLECentral.swift; sourceTree = "<group>"; };
+		F8A1739B229FF80A0085102B /* ReadingPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingPacket.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,11 +109,15 @@
 			children = (
 				F8A17365229EE7990085102B /* AppDelegate.swift */,
 				F8A17367229EE7990085102B /* FirstViewController.swift */,
+				F8A1739B229FF80A0085102B /* ReadingPacket.swift */,
 				F8A17369229EE7990085102B /* SecondViewController.swift */,
 				F8A1736B229EE7990085102B /* Main.storyboard */,
 				F8A1736E229EE79A0085102B /* Assets.xcassets */,
 				F8A17370229EE79A0085102B /* LaunchScreen.storyboard */,
 				F8A17373229EE79A0085102B /* Info.plist */,
+				F8A17395229EE89F0085102B /* ThirdViewController.swift */,
+				F8A17397229F056A0085102B /* BLEManager.swift */,
+				F8A17399229F17A40085102B /* BLECentral.swift */,
 			);
 			path = IoT_Respirator;
 			sourceTree = "<group>";
@@ -259,8 +271,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F8A1739C229FF80A0085102B /* ReadingPacket.swift in Sources */,
 				F8A1736A229EE7990085102B /* SecondViewController.swift in Sources */,
+				F8A1739A229F17A40085102B /* BLECentral.swift in Sources */,
 				F8A17366229EE7990085102B /* AppDelegate.swift in Sources */,
+				F8A17398229F056A0085102B /* BLEManager.swift in Sources */,
+				F8A17396229EE89F0085102B /* ThirdViewController.swift in Sources */,
 				F8A17368229EE7990085102B /* FirstViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
