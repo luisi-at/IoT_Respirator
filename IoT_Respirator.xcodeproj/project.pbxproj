@@ -21,6 +21,7 @@
 		F8A1739C229FF80A0085102B /* ReadingPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1739B229FF80A0085102B /* ReadingPacket.swift */; };
 		F8A173A622A05B4E0085102B /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F8A173A322A05AE10085102B /* Charts.framework */; };
 		F8A173A722A05B4E0085102B /* Charts.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F8A173A322A05AE10085102B /* Charts.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		F8A173AC22A2B2C90085102B /* GradientPolyline.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A173AB22A2B2C90085102B /* GradientPolyline.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -95,6 +96,7 @@
 		F8A17399229F17A40085102B /* BLECentral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLECentral.swift; sourceTree = "<group>"; };
 		F8A1739B229FF80A0085102B /* ReadingPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingPacket.swift; sourceTree = "<group>"; };
 		F8A1739D22A05AE10085102B /* Charts.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Charts.xcodeproj; path = ../Charts/Charts.xcodeproj; sourceTree = "<group>"; };
+		F8A173AB22A2B2C90085102B /* GradientPolyline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientPolyline.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -151,6 +153,7 @@
 				F8A17367229EE7990085102B /* FirstViewController.swift */,
 				F8A1739B229FF80A0085102B /* ReadingPacket.swift */,
 				F8A17369229EE7990085102B /* SecondViewController.swift */,
+				F8A173AB22A2B2C90085102B /* GradientPolyline.swift */,
 				F8A1736B229EE7990085102B /* Main.storyboard */,
 				F8A1736E229EE79A0085102B /* Assets.xcassets */,
 				F8A17370229EE79A0085102B /* LaunchScreen.storyboard */,
@@ -348,6 +351,7 @@
 				F8A1739C229FF80A0085102B /* ReadingPacket.swift in Sources */,
 				F8A1736A229EE7990085102B /* SecondViewController.swift in Sources */,
 				F8A1739A229F17A40085102B /* BLECentral.swift in Sources */,
+				F8A173AC22A2B2C90085102B /* GradientPolyline.swift in Sources */,
 				F8A17366229EE7990085102B /* AppDelegate.swift in Sources */,
 				F8A17398229F056A0085102B /* BLEManager.swift in Sources */,
 				F8A17396229EE89F0085102B /* ThirdViewController.swift in Sources */,

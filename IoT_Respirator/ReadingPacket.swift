@@ -7,12 +7,7 @@
 //
 
 import Foundation
-
-// Make a struct that is globally accessible across the application
-struct GlobalDataArray
-{
-    var pollutionData = [ReadingPacket]()
-}
+import MapKit
 
 // The class to hold each of the readings from the board
 struct ReadingPacket
@@ -28,6 +23,7 @@ struct ReadingPacket
     var location: (latitude: Float32, longitude: Float32)
     var timeReceived: Double // to show progression over the graph, gives the x axis
     var originalJSON: String // required,
+    var mapKitCoordinate: CLLocationCoordinate2D? // this optional upon instance creation
     
 }
 
@@ -75,6 +71,8 @@ extension ReadingPacket{
         let long = convertToCoordinate(unsignedValue: longVal, unsignedScale: longScale)
         let coords = (lat, long)
         self.location = coords
+        // Assign the mapkit coordinate to prevent duplicate processing
+        self.mapKitCoordinate = returnCLLocationCoordinate(lat: lat, long: long)
         
     }
     
@@ -88,6 +86,25 @@ extension ReadingPacket{
         let coord = (Float32)(intermediate) // split to help with compile-time
         
         return coord
+    }
+    
+    private func returnCLLocationCoordinate(lat: Float32, long: Float32) -> CLLocationCoordinate2D {
+        
+        let latitudeFromFloat = Double(lat)
+        let longitudeFromFloat = Double(long)
+        
+        var cllCoordinate: CLLocationCoordinate2D
+        
+        if (latitudeFromFloat != 0) && (longitudeFromFloat != 0) {
+            cllCoordinate = GlobalArrays.currentLocation
+        }
+        else {
+            let point = CGPoint(x: latitudeFromFloat, y: longitudeFromFloat)
+            cllCoordinate = CLLocationCoordinate2DMake(CLLocationDegrees(point.x), CLLocationDegrees(point.y))
+        }
+        
+        return cllCoordinate
+        
     }
     
 }

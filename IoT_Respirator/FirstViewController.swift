@@ -9,20 +9,35 @@
 import UIKit
 import NotificationCenter
 import Charts
+import CoreLocation
 
 struct GlobalArrays
 {
     static var globalData: [ReadingPacket] = []
     static var startTime: Date!
+    static var currentLocation: CLLocationCoordinate2D!
 }
 
-class FirstViewController: UIViewController {
+class FirstViewController: UIViewController, CLLocationManagerDelegate {
+    
+    let locationManager = CLLocationManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         // Load in the BLE manager on the first view to be shared across the other two
         BluetoothManager.shared.setup()
+        
+        // Request the current position of the user for backup
+        // (Probably should be in another place in the code, but it'll work
+        locationManager.requestAlwaysAuthorization()
+        locationManager.requestWhenInUseAuthorization()
+        if CLLocationManager.locationServicesEnabled() {
+            locationManager.delegate = self
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager.startUpdatingLocation()
+        }
+        
         // Register a notification so that the data can be retrieved from the BLE methods
         NotificationCenter.default.addObserver(self, selector: #selector(onUartReceived(_:)), name: .didReceiveUartString, object: nil)
         GlobalArrays.startTime = Date() // TODO change this when the 'start' button is pressed
@@ -70,6 +85,15 @@ class FirstViewController: UIViewController {
         //self.updateChart()
         
     }
+    
+    // Get the current location of the user for use if the GPS drops/fails
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let locationValue: CLLocationCoordinate2D = manager.location?.coordinate else { return }
+        GlobalArrays.currentLocation = locationValue
+    }
+    
+    
+    // Chart updates
     
     private func updateParticulates(){
         var pm25 = [ChartDataEntry]()

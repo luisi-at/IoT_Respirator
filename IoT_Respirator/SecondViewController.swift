@@ -28,8 +28,57 @@ class SecondViewController: UIViewController {
         
     }
     
+    @IBAction func mapTypeChanged(_ sender: UISegmentedControl) {
+    
+        //mapView.mapType = MKMapType.init(rawValue: UInt(sender.selectedSegmentIndex)) ?? .standard
+        
+        switch sender.selectedSegmentIndex {
+        case 0:
+            mapView.mapType = .standard
+            // Do pollution map here
+        case 1:
+            mapView.mapType = .hybrid
+            // Draw the route taken
+            addRouteOnMapView()
+        default:
+            mapView.mapType = .standard
+        }
+    
+    }
+    
+    func addRouteOnMapView() {
+        var coordinatesList = [CLLocationCoordinate2D]()
+        
+        // Extract the coordinates
+        for i in 0..<GlobalArrays.globalData.count {
+            // build up the array of coordinates for the line
+            let coord = GlobalArrays.globalData[i].mapKitCoordinate
+            coordinatesList.append(coord!)
+        }
+        
+        let routePolyline = MKPolyline(coordinates: coordinatesList, count: coordinatesList.count)
+        mapView.addOverlay(routePolyline)
+        
+    }
+    
 }
 
 extension SecondViewController: MKMapViewDelegate {
     
+    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        
+        // Checks for the route view
+        if let overlay = overlay as? MKPolyline{
+            let lineView = MKPolylineRenderer(overlay: overlay)
+            lineView.strokeColor = UIColor.blue
+            return lineView
+        }
+        
+        return MKOverlayRenderer()
+    }
+    
+    
 }
+
+// Subclass the polyline to add an identifier (may cause issues?)
+
