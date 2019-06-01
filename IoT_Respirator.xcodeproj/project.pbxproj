@@ -19,6 +19,8 @@
 		F8A17398229F056A0085102B /* BLEManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A17397229F056A0085102B /* BLEManager.swift */; };
 		F8A1739A229F17A40085102B /* BLECentral.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A17399229F17A40085102B /* BLECentral.swift */; };
 		F8A1739C229FF80A0085102B /* ReadingPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1739B229FF80A0085102B /* ReadingPacket.swift */; };
+		F8A173A622A05B4E0085102B /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F8A173A322A05AE10085102B /* Charts.framework */; };
+		F8A173A722A05B4E0085102B /* Charts.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F8A173A322A05AE10085102B /* Charts.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,7 +38,42 @@
 			remoteGlobalIDString = F8A17361229EE7990085102B;
 			remoteInfo = IoT_Respirator;
 		};
+		F8A173A222A05AE10085102B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F8A1739D22A05AE10085102B /* Charts.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 65AD9E95D9ED4DC0BD73A743;
+			remoteInfo = Charts;
+		};
+		F8A173A422A05AE10085102B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F8A1739D22A05AE10085102B /* Charts.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1CBBC58C6CE1EBEE9852CE41;
+			remoteInfo = ChartsTests;
+		};
+		F8A173A822A05B4E0085102B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F8A1739D22A05AE10085102B /* Charts.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = A58A4ED274A941CA248EA921;
+			remoteInfo = Charts;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F8A173AA22A05B4F0085102B /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				F8A173A722A05B4E0085102B /* Charts.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		F8A17362229EE7990085102B /* IoT_Respirator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IoT_Respirator.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -57,6 +94,7 @@
 		F8A17397229F056A0085102B /* BLEManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEManager.swift; sourceTree = "<group>"; };
 		F8A17399229F17A40085102B /* BLECentral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLECentral.swift; sourceTree = "<group>"; };
 		F8A1739B229FF80A0085102B /* ReadingPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingPacket.swift; sourceTree = "<group>"; };
+		F8A1739D22A05AE10085102B /* Charts.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Charts.xcodeproj; path = ../Charts/Charts.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +102,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F8A173A622A05B4E0085102B /* Charts.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -87,6 +126,7 @@
 		F8A17359229EE7990085102B = {
 			isa = PBXGroup;
 			children = (
+				F8A1739D22A05AE10085102B /* Charts.xcodeproj */,
 				F8A17364229EE7990085102B /* IoT_Respirator */,
 				F8A1737B229EE79A0085102B /* IoT_RespiratorTests */,
 				F8A17386229EE79A0085102B /* IoT_RespiratorUITests */,
@@ -140,6 +180,15 @@
 			path = IoT_RespiratorUITests;
 			sourceTree = "<group>";
 		};
+		F8A1739E22A05AE10085102B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F8A173A322A05AE10085102B /* Charts.framework */,
+				F8A173A522A05AE10085102B /* ChartsTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -150,10 +199,12 @@
 				F8A1735E229EE7990085102B /* Sources */,
 				F8A1735F229EE7990085102B /* Frameworks */,
 				F8A17360229EE7990085102B /* Resources */,
+				F8A173AA22A05B4F0085102B /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				F8A173A922A05B4E0085102B /* PBXTargetDependency */,
 			);
 			name = IoT_Respirator;
 			productName = IoT_Respirator;
@@ -230,6 +281,12 @@
 			mainGroup = F8A17359229EE7990085102B;
 			productRefGroup = F8A17363229EE7990085102B /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = F8A1739E22A05AE10085102B /* Products */;
+					ProjectRef = F8A1739D22A05AE10085102B /* Charts.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				F8A17361229EE7990085102B /* IoT_Respirator */,
@@ -238,6 +295,23 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		F8A173A322A05AE10085102B /* Charts.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Charts.framework;
+			remoteRef = F8A173A222A05AE10085102B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F8A173A522A05AE10085102B /* ChartsTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = ChartsTests.xctest;
+			remoteRef = F8A173A422A05AE10085102B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		F8A17360229EE7990085102B /* Resources */ = {
@@ -309,6 +383,11 @@
 			isa = PBXTargetDependency;
 			target = F8A17361229EE7990085102B /* IoT_Respirator */;
 			targetProxy = F8A17384229EE79A0085102B /* PBXContainerItemProxy */;
+		};
+		F8A173A922A05B4E0085102B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Charts;
+			targetProxy = F8A173A822A05B4E0085102B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -451,6 +530,7 @@
 		F8A1738D229EE79A0085102B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 3GT3N4T62X;
@@ -469,6 +549,7 @@
 		F8A1738E229EE79A0085102B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 3GT3N4T62X;

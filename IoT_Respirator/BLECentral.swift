@@ -104,8 +104,9 @@ extension CentralManager: CBPeripheralDelegate
             let received = uartString(from: characteristic)
             //print(received)
             let userInfo = ["uart": received]
+            // Raise a notification that the string has arrived
             NotificationCenter.default.post(name: .didReceiveUartString, object: nil, userInfo: userInfo)
-            // raise a notification that the string has arrived
+            
             
         default:
             print("Unhandled Characteristic UUID: \(characteristic.uuid)")
