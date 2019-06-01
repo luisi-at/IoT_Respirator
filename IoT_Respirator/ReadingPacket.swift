@@ -9,9 +9,13 @@
 import Foundation
 import MapKit
 
+
+struct AQITable {
+    
+}
+
 // The class to hold each of the readings from the board
-struct ReadingPacket
-{
+struct ReadingPacket {
     var ethanolRelative: UInt16
     var hydrogenRelative: UInt16
     var totalVOC: UInt16
@@ -24,10 +28,11 @@ struct ReadingPacket
     var timeReceived: Double // to show progression over the graph, gives the x axis
     var originalJSON: String // required,
     var mapKitCoordinate: CLLocationCoordinate2D? // this optional upon instance creation
+    var airQualityEstimate: Int?
     
 }
 
-extension ReadingPacket{
+extension ReadingPacket {
     init?(json: [String: Any], jsonString: String){
         guard let gasReadingsJSON = json["GASR"] as? [String: UInt16],
             let eth = gasReadingsJSON["ETRV"],
@@ -59,7 +64,7 @@ extension ReadingPacket{
         self.carbonMonoxideRelative = Int32(co)
         self.nitrogenOxidesRelative = Int32(nox)
         
-        self.particulateMatter2p5 = Float32(bitPattern: pm2p5) // Represent now as floating point number, using the bit pattern
+        self.particulateMatter2p5 = Float32(bitPattern: pm2p5) // Represent now as floating point number, using the bit pattern (in ug/m3)
         self.particulateMatter10 = Float32(bitPattern: pm10)
         
         self.timeReceived =  Date().timeIntervalSince(GlobalArrays.startTime) // Timestamp the reading from when the recording started
@@ -73,6 +78,13 @@ extension ReadingPacket{
         self.location = coords
         // Assign the mapkit coordinate to prevent duplicate processing
         self.mapKitCoordinate = returnCLLocationCoordinate(lat: lat, long: long)
+        
+        // Convert the relative values into ppm estimates
+        let ppmCo = calculatePPMEquivalent(adcValue: self.carbonMonoxideRelative)
+        let ppmNox = calculatePPMEquivalent(adcValue: self.nitrogenOxidesRelative)
+        
+        
+        
         
     }
     
@@ -106,6 +118,205 @@ extension ReadingPacket{
         return cllCoordinate
         
     }
+    
+    private func calculatePPMEquivalent(adcValue: Int32) -> Int {
+        
+        // From the MiCS calibration datasheet - THESE ARE AN ESTIMATE
+        if adcValue <= 0 {
+            return 0
+        }
+        
+        let c1: Double = 1000
+        let r1: Double = 20000
+        let c2: Double = 3500
+        let r2: Double = 2000
+        
+        let adcResolution: Double = 4095
+        let gain: Double = 6
+        let systemVoltage: Double = 3.3 // Voltage of the nRF52832 on the board
+        // value is the ADC reading
+        let boardResistor: Double = 10000
+        
+        let measuredVoltage = ((Double(adcValue) * systemVoltage) / adcResolution) * gain
+        
+        let rMeasured: Double = (boardResistor / measuredVoltage) - boardResistor
+        
+        let logC = log((c1/c2))
+        let logR = log((r2/r1))
+        let logRMeasured = log((rMeasured/r1))
+        
+        let intermediate = (logC * logR)/logRMeasured
+        let x: Int = Int(c1 * pow(intermediate, 10))
+        
+        return x
+    }
+    
+    
+    // Get the equivalent AQI reading for each of the incoming values
+    // Note that minute-by-minute values are not usable for a proper AQI measurement, hence 'equivalent'
+    private func getAQIEquivalent(aqiType: String, value: Double) -> Int {
+        
+        switch aqiType {
+        case "pm2.5":
+            return getParticulate25AQI(value: value)
+        case "pm10":
+            return getParticulate10AQI(value: value)
+        case "co":
+            return getCarbonMonoxideAQI(value: value)
+        case "nox":
+            return getNitrousOxidesAQI(value: value)
+        default:
+            <#code#>
+        }
+        
+        
+        return 0
+    }
+    
+    // Calculate the AQI index to be used as an Equivalent AQI value
+    
+    private func getParticulate25AQI(value: Double) -> Int {
+        
+        if value >= 0 && value <= 12.0 {
+            let index = Int((((50 - 0)/(12.0 - 0)) * (value - 0)) + 0)
+            return index
+        }
+        if value >= 12.1 && value <= 35.4 {
+            let index = Int((((100 - 51)/(35.4 - 12.1)) * (value - 12.1)) + 51)
+            return index
+        }
+        if value >= 35.5 && value <= 55.4 {
+            let index = Int((((150 - 101)/(55.4 - 35.5)) * (value - 35.5)) + 101)
+            return index
+        }
+        if value >= 55.5 && value <= 150.4 {
+            let index = Int((((200 - 151)/(150.4 - 55.5)) * (value - 55.5)) + 151)
+            return index
+        }
+        if value >= 150.5 && value <= 250.4 {
+            let index = Int((((300 - 201)/(250.4 - 150.5)) * (value - 150.5)) + 201)
+            return index
+        }
+        if value >= 250.5 && value <= 350.4 {
+            let index = Int((((400 - 301)/(350.4 - 250.5)) * (value - 250.5)) + 301)
+            return index
+        }
+        if value >= 350.5 && value <= 500.4 {
+            let index = Int((((500 - 401)/(500.4 - 350.5)) * (value - 350.5)) + 401)
+            return index
+        }
+        
+        return 0
+        
+    }
+    
+    private func getParticulate10AQI(value: Double) -> Int {
+        
+        if value >= 0 && value <= 54 {
+            let index = Int((((50 - 0)/(54 - 0)) * (value - 0)) + 0)
+            return index
+        }
+        if value >= 55 && value <= 154 {
+            let index = Int((((100 - 51)/(154 - 55)) * (value - 55)) + 51)
+            return index
+        }
+        if value >= 155 && value <= 254 {
+            let index = Int((((150 - 101)/(254 - 155)) * (value - 155)) + 101)
+            return index
+        }
+        if value >= 255 && value <= 354 {
+            let index = Int((((200 - 151)/(354 - 255)) * (value - 255)) + 151)
+            return index
+        }
+        if value >= 355 && value <= 424 {
+            let index = Int((((300 - 201)/(424 - 355)) * (value - 355)) + 201)
+            return index
+        }
+        if value >= 425 && value <= 504 {
+            let index = Int((((400 - 301)/(504 - 425)) * (value - 425)) + 301)
+            return index
+        }
+        if value >= 505 && value <= 604 {
+            let index = Int((((500 - 401)/(604 - 505)) * (value - 505)) + 401)
+            return index
+        }
+        
+        return 0
+        
+    }
+    
+    private func getCarbonMonoxideAQI(value: Double) -> Int {
+        
+        if value >= 0 && value <= 4.4 {
+            let index = Int((((50 - 0)/(4.4 - 0)) * (value - 0)) + 0)
+            return index
+        }
+        if value >= 4.5 && value <= 9.4 {
+            let index = Int((((100 - 51)/(9.4 - 4.5)) * (value - 4.5)) + 51)
+            return index
+        }
+        if value >= 9.5 && value <= 12.4 {
+            let index = Int((((150 - 101)/(12.4 - 9.5)) * (value - 9.5)) + 101)
+            return index
+        }
+        if value >= 12.5 && value <= 15.4 {
+            let index = Int((((200 - 151)/(15.4 - 12.5)) * (value - 12.5)) + 151)
+            return index
+        }
+        if value >= 15.5 && value <= 30.4 {
+            let index = Int((((300 - 201)/(30.4 - 15.5)) * (value - 15.5)) + 201)
+            return index
+        }
+        if value >= 30.5 && value <= 40.4 {
+            let index = Int((((400 - 301)/(40.4 - 30.5)) * (value - 30.5)) + 301)
+            return index
+        }
+        if value >= 40.5 && value <= 50.4 {
+            let index = Int((((500 - 401)/(50.4 - 40.5)) * (value - 50.4)) + 401)
+            return index
+        }
+        
+        return 0
+        
+    }
+    
+    // These values are estimates and are not based on scientific fact,
+    // Nor are they based on the AQI Technical Recommendations Document
+    private func getNitrousOxidesAQI(value: Double) -> Int {
+        
+        if value >= 0 && value <= 0.5 {
+            let index = Int((((50 - 0)/(0.5 - 0)) * (value - 0)) + 0)
+            return index
+        }
+        if value >= 0.6 && value <= 1.5 {
+            let index = Int((((100 - 51)/(1.5 - 0.6)) * (value - 0.6)) + 51)
+            return index
+        }
+        if value >= 1.6 && value <= 2.5 {
+            let index = Int((((150 - 101)/(2.5 - 1.6)) * (value - 1.6)) + 101)
+            return index
+        }
+        if value >= 2.6 && value <= 3.5 {
+            let index = Int((((200 - 151)/(3.5 - 2.6)) * (value - 2.6)) + 151)
+            return index
+        }
+        if value >= 3.6 && value <= 4.5 {
+            let index = Int((((300 - 201)/(4.5 - 3.6)) * (value - 3.6)) + 201)
+            return index
+        }
+        if value >= 4.6 && value <= 5.0 {
+            let index = Int((((400 - 301)/(5.0 - 4.6)) * (value - 4.6)) + 301)
+            return index
+        }
+        if value >= 5.1 {
+            let index = 500
+            return index
+        }
+        
+        return 0
+        
+    }
+    
     
 }
 

@@ -35,7 +35,8 @@ class SecondViewController: UIViewController {
         switch sender.selectedSegmentIndex {
         case 0:
             mapView.mapType = .standard
-            // Do pollution map here
+            // Draw the gradient of the AQI
+            addPollutionOnMapView()
         case 1:
             mapView.mapType = .hybrid
             // Draw the route taken
@@ -55,11 +56,26 @@ class SecondViewController: UIViewController {
             let coord = GlobalArrays.globalData[i].mapKitCoordinate
             coordinatesList.append(coord!)
         }
-        
+ 
         let routePolyline = MKPolyline(coordinates: coordinatesList, count: coordinatesList.count)
         mapView.addOverlay(routePolyline)
         
     }
+    
+    func addPollutionOnMapView() {
+        var coordinatesList = [CLLocationCoordinate2D]()
+        
+        // Extract the coordinates
+        for i in 0..<GlobalArrays.globalData.count {
+            // build up the array of coordinates for the line
+            let coord = GlobalArrays.globalData[i].mapKitCoordinate
+            coordinatesList.append(coord!)
+        }
+        
+        let pollutionPolyline = GradientPolyline(coordinates: coordinatesList, count: coordinatesList.count)
+        mapView.addOverlay(pollutionPolyline)
+    }
+    
     
 }
 
@@ -68,10 +84,17 @@ extension SecondViewController: MKMapViewDelegate {
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         
         // Checks for the route view
-        if let overlay = overlay as? MKPolyline{
+        if let overlay = overlay as? MKPolyline {
             let lineView = MKPolylineRenderer(overlay: overlay)
             lineView.strokeColor = UIColor.blue
             return lineView
+        }
+        
+        // Check for the gradient view
+        if let overlay = overlay as? GradientPolyline {
+            let polylineRender = GradientPolylineRenderer(overlay: overlay)
+            polylineRender.lineWidth = 5
+            return polylineRender
         }
         
         return MKOverlayRenderer()
