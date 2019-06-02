@@ -13,11 +13,13 @@ import NotificationCenter // raise an event when the array has been added to
 class SecondViewController: UIViewController {
 
     var selected: UInt8 = 0
+    var gradientLayer: CAGradientLayer!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         NotificationCenter.default.addObserver(self, selector: #selector(onGlobalUpdated(_:)), name: .didUpdateGlobalArray, object: nil)
+        fillColorViewer()
         
         // Zoom to current location on load
         guard let userLocation = GlobalArrays.currentLocation else { return }
@@ -30,6 +32,7 @@ class SecondViewController: UIViewController {
 
     
     @IBOutlet weak var mapView: MKMapView!
+    @IBOutlet weak var colorViewer: UIView!
     
     @objc func onGlobalUpdated(_ notification: Notification) {
         
@@ -103,6 +106,16 @@ class SecondViewController: UIViewController {
         mapView.addOverlay(pollutionPolyline)
     }
     
+    func fillColorViewer() {
+        gradientLayer = CAGradientLayer()
+        
+        gradientLayer.frame = colorViewer.bounds
+        gradientLayer.colors = [UIColor.red.cgColor, UIColor.yellow.cgColor, UIColor.green.cgColor]
+        
+        colorViewer.layer.addSublayer(gradientLayer)
+        
+    }
+    
     
 }
 
@@ -124,7 +137,7 @@ extension SecondViewController: MKMapViewDelegate {
         // Check for the gradient view
         if selected == 0 {
             let polylineRender = GradientPolylineRenderer(overlay: overlay)
-            polylineRender.lineWidth = 10
+            polylineRender.lineWidth = 15
             polylineRender.lineJoin = .round
             polylineRender.miterLimit = 10
             polylineRender.lineCap = .round

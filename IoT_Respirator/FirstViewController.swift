@@ -58,6 +58,7 @@ class FirstViewController: UIViewController, CLLocationManagerDelegate {
         // Deserialize the JSON here and add to the global array
         //let data = rxString.data(using: .ascii)! // convert the JSON string to data in pure ASCII (unsigned char)
         let trimmedString = rxString.replacingOccurrences(of: "\0", with: "")
+        
         let data = trimmedString.data(using: .ascii)!
         //let tempString = String(data: data, encoding: .ascii)!
         //print(tempString)
@@ -73,6 +74,7 @@ class FirstViewController: UIViewController, CLLocationManagerDelegate {
                 self.updateRawCoNox()
                 self.updateRawVOC()
                 print("Estimated AQI Value: \(String(describing: addition?.airQualityEstimate))")
+                NotificationCenter.default.post(name: .didReceiveJSONString, object: nil, userInfo: ["json": trimmedString])
                 
             }
         } catch let error {

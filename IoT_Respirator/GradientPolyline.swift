@@ -32,7 +32,7 @@ extension GradientPolyline {
         let aqi_MODERATE: Double = 51
         let aqi_GOOD: Double = 50
         
-        let H_MIN: Double = 0.3 // want a green color
+        let H_MIN: Double = 0.33 // want a green color
         let H_MAX: Double = 0.01 // want a red color
         let H_DIFF: Double = H_MIN - H_MAX
         
@@ -44,40 +44,40 @@ extension GradientPolyline {
                 return CGFloat(H_MIN)
             }
             // Weight the hue according to the AQI value
-            if aqiEquiv > aqi_GOOD || aqiEquiv <= aqi_MODERATE {
+            if aqiEquiv > aqi_GOOD && aqiEquiv <= aqi_MODERATE {
                 
                 let interval = (aqi_MODERATE - aqi_GOOD)
                 let mult = ((aqiEquiv - aqi_GOOD) * (H_DIFF))
-                return CGFloat((H_MIN +  mult / interval))
+                return CGFloat((H_MAX +  mult / interval))
                 
             }
             
-            if aqiEquiv > aqi_MODERATE || aqiEquiv <= aqi_USG {
+            if aqiEquiv > aqi_MODERATE && aqiEquiv <= aqi_USG {
                 
                 let interval = (aqi_USG - aqi_MODERATE)
                 let mult = ((aqiEquiv - aqi_MODERATE) * (H_DIFF))
-                return CGFloat((H_MIN +  mult / interval))
+                return CGFloat((H_MAX +  mult / interval))
                 
             }
             if aqiEquiv > aqi_USG || aqiEquiv <= aqi_UNHEALTHY {
                 
                 let interval = (aqi_UNHEALTHY - aqi_USG)
                 let mult = ((aqiEquiv - aqi_USG) * (H_DIFF))
-                return CGFloat((H_MIN +  mult / interval))
+                return CGFloat((H_MAX +  mult / interval))
                 
             }
             if aqiEquiv > aqi_UNHEALTHY || aqiEquiv <= aqi_VERY_UNHEALTHY {
                 
                 let interval = (aqi_VERY_UNHEALTHY - aqi_UNHEALTHY)
                 let mult = ((aqiEquiv - aqi_UNHEALTHY) * (H_DIFF))
-                return CGFloat((H_MIN +  mult / interval))
+                return CGFloat((H_MAX +  mult / interval))
                 
             }
             if aqiEquiv > aqi_VERY_UNHEALTHY || aqiEquiv <= aqi_HAZARD {
                 
                 let interval = (aqi_HAZARD - aqi_VERY_UNHEALTHY)
                 
-                return CGFloat((H_MIN + ((aqiEquiv - aqi_VERY_UNHEALTHY) * (H_MIN - H_MAX)) / interval))
+                return CGFloat((H_MAX + ((aqiEquiv - aqi_VERY_UNHEALTHY) * (H_MIN - H_MAX)) / interval))
                 
             }
             
