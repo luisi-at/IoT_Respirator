@@ -34,7 +34,7 @@ class FirstViewController: UIViewController, CLLocationManagerDelegate {
         locationManager.requestWhenInUseAuthorization()
         if CLLocationManager.locationServicesEnabled() {
             locationManager.delegate = self
-            locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters 
             locationManager.startUpdatingLocation()
         }
         
@@ -59,8 +59,8 @@ class FirstViewController: UIViewController, CLLocationManagerDelegate {
         //let data = rxString.data(using: .ascii)! // convert the JSON string to data in pure ASCII (unsigned char)
         let trimmedString = rxString.replacingOccurrences(of: "\0", with: "")
         let data = trimmedString.data(using: .ascii)!
-        let tempString = String(data: data, encoding: .ascii)!
-        print(tempString)
+        //let tempString = String(data: data, encoding: .ascii)!
+        //print(tempString)
         do {
             if let jsonContainer = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
                 let addition = ReadingPacket(json: jsonContainer, jsonString: rxString)
@@ -72,6 +72,8 @@ class FirstViewController: UIViewController, CLLocationManagerDelegate {
                 self.updateCO2()
                 // update NOx and CO
                 self.updateRawVOC()
+                print("Estimated AQI Value: \(String(describing: addition?.airQualityEstimate))")
+                
             }
         } catch let error {
             print(error.localizedDescription)
@@ -234,7 +236,6 @@ class FirstViewController: UIViewController, CLLocationManagerDelegate {
 extension Notification.Name
 {
     static let didReceiveUartString = Notification.Name("didReceiveUartString")
-    static let didUpdateGlobalArray = Notification.Name("didUpdateGlobalArray")
 }
 
 

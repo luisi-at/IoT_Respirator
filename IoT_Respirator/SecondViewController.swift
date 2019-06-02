@@ -12,10 +12,20 @@ import NotificationCenter // raise an event when the array has been added to
 
 class SecondViewController: UIViewController {
 
+    var selected: UInt8 = 0
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         NotificationCenter.default.addObserver(self, selector: #selector(onGlobalUpdated(_:)), name: .didUpdateGlobalArray, object: nil)
+        
+        // Zoom to current location on load
+        guard let userLocation = GlobalArrays.currentLocation else { return }
+        let span = MKCoordinateSpan(latitudeDelta: 0.002, longitudeDelta: 0.002)
+        let viewRegion = MKCoordinateRegion(center: userLocation, span: span)
+        mapView.setRegion(viewRegion, animated: true)
+        mapView.showsUserLocation = true
+        
     }
 
     
@@ -25,6 +35,21 @@ class SecondViewController: UIViewController {
         
         // Extract the data here from the global array
         // TODO- call the map update routine
+        mapView.removeOverlays(mapView.overlays)
+        
+        switch selected {
+        case 0:
+            // Draw the gradient of the AQI
+            
+            addPollutionOnMapView()
+            
+        case 1:
+            // Draw the route taken
+           
+            addRouteOnMapView()
+        default:
+            break;
+        }
         
     }
     
@@ -35,12 +60,12 @@ class SecondViewController: UIViewController {
         switch sender.selectedSegmentIndex {
         case 0:
             mapView.mapType = .standard
-            // Draw the gradient of the AQI
-            addPollutionOnMapView()
+            selected = 0
+            //addPollutionOnMapView()
         case 1:
             mapView.mapType = .hybrid
-            // Draw the route taken
-            addRouteOnMapView()
+            selected = 1
+            //addRouteOnMapView()
         default:
             mapView.mapType = .standard
         }
@@ -72,7 +97,9 @@ class SecondViewController: UIViewController {
             coordinatesList.append(coord!)
         }
         
-        let pollutionPolyline = GradientPolyline(coordinates: coordinatesList, count: coordinatesList.count)
+        let pollutionPolyline = GradientPolyline(locations: coordinatesList, readings: GlobalArrays.globalData)
+            //GradientPolyline(coordinates: coordinatesList, count: coordinatesList.count, GlobalArrays.globalData)
+        
         mapView.addOverlay(pollutionPolyline)
     }
     
@@ -84,16 +111,18 @@ extension SecondViewController: MKMapViewDelegate {
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         
         // Checks for the route view
-        if let overlay = overlay as? MKPolyline {
+        if selected == 1 {
             let lineView = MKPolylineRenderer(overlay: overlay)
             lineView.strokeColor = UIColor.blue
+            lineView.lineJoin = CGLineJoin.round
             return lineView
         }
         
         // Check for the gradient view
-        if let overlay = overlay as? GradientPolyline {
+        if selected == 0 {
             let polylineRender = GradientPolylineRenderer(overlay: overlay)
-            polylineRender.lineWidth = 5
+            polylineRender.lineWidth = 10
+            polylineRender.lineJoin = CGLineJoin.round
             return polylineRender
         }
         
@@ -104,4 +133,7 @@ extension SecondViewController: MKMapViewDelegate {
 }
 
 // Subclass the polyline to add an identifier (may cause issues?)
+extension Notification.Name {
+    static let didUpdateGlobalArray = Notification.Name("didUpdateGlobalArray")
+}
 

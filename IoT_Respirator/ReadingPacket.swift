@@ -83,9 +83,21 @@ extension ReadingPacket {
         let ppmCo = calculatePPMEquivalent(adcValue: self.carbonMonoxideRelative)
         let ppmNox = calculatePPMEquivalent(adcValue: self.nitrogenOxidesRelative)
         
+        var aqiArray = [Int]()
         
+        let coAQI = getAQIEquivalent(aqiType: "co", value: Double(ppmCo)) / 5
+        aqiArray.append(coAQI)
+        let noxAQI = getAQIEquivalent(aqiType: "nox", value: Double(ppmNox)) / 120
+        aqiArray.append(noxAQI)
+        let pm25AQI  = getAQIEquivalent(aqiType: "pm2.5", value: Double(self.particulateMatter2p5))
+        aqiArray.append(pm25AQI)
+        let pm10AQI = getAQIEquivalent(aqiType: "pm10", value: Double(self.particulateMatter10))
+        aqiArray.append(pm10AQI)
         
+        aqiArray.sort(by: >) // Sort in descending order to get the maximum value
         
+        self.airQualityEstimate = aqiArray[0]
+
     }
     
     private func convertToCoordinate(unsignedValue: UInt32, unsignedScale: UInt32) -> Float32{
@@ -107,7 +119,7 @@ extension ReadingPacket {
         
         var cllCoordinate: CLLocationCoordinate2D
         
-        if (latitudeFromFloat != 0) && (longitudeFromFloat != 0) {
+        if (latitudeFromFloat == 0) && (longitudeFromFloat == 0) {
             cllCoordinate = GlobalArrays.currentLocation
         }
         else {
@@ -127,9 +139,9 @@ extension ReadingPacket {
         }
         
         let c1: Double = 1000
-        let r1: Double = 20000
+        let r1: Double = 50000
         let c2: Double = 3500
-        let r2: Double = 2000
+        let r2: Double = 40000
         
         let adcResolution: Double = 4095
         let gain: Double = 6
@@ -143,12 +155,12 @@ extension ReadingPacket {
         
         let logC = log((c1/c2))
         let logR = log((r2/r1))
-        let logRMeasured = log((rMeasured/r1))
+        let logRMeasured = log((rMeasured.magnitude/r1)) // force to be positive
         
         let intermediate = (logC * logR)/logRMeasured
-        let x: Int = Int(c1 * pow(intermediate, 10))
+        let x: Int = Int(c1 * pow(10, intermediate.magnitude)) / 200 // apply a scaling factor
         
-        return x
+        return abs(x)
     }
     
     
@@ -166,11 +178,9 @@ extension ReadingPacket {
         case "nox":
             return getNitrousOxidesAQI(value: value)
         default:
-            <#code#>
+            return 0
         }
         
-        
-        return 0
     }
     
     // Calculate the AQI index to be used as an Equivalent AQI value
