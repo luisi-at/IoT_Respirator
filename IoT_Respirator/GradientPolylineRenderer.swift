@@ -27,7 +27,6 @@ class GradientPolylineRenderer: MKPolylineRenderer {
             let point = self.point(for: self.polyline.points()[index])
             let path = CGMutablePath()
             
-            
             currentColor = polyLine.getHue(from: index)
             
             if index == 0 {
@@ -46,6 +45,8 @@ class GradientPolylineRenderer: MKPolylineRenderer {
                 let gradient = CGGradient(colorsSpace: nil, colors: colors, locations: [0, 1])
                 
                 context.setLineWidth(baseWidth)
+                context.setLineJoin(.round)
+                context.setLineCap(.round)
                 context.replacePathWithStrokedPath()
                 context.clip()
                 context.drawLinearGradient(gradient!, start: prevPoint, end: point, options: [])
@@ -54,4 +55,9 @@ class GradientPolylineRenderer: MKPolylineRenderer {
             prevColor = currentColor
         }
     }
+    
+    
+    
+    
+    
 }

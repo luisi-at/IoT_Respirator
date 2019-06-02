@@ -114,7 +114,10 @@ extension SecondViewController: MKMapViewDelegate {
         if selected == 1 {
             let lineView = MKPolylineRenderer(overlay: overlay)
             lineView.strokeColor = UIColor.blue
-            lineView.lineJoin = CGLineJoin.round
+            lineView.lineJoin = .round
+            lineView.lineCap = .round
+            lineView.miterLimit = 10
+            lineView.lineWidth = 10
             return lineView
         }
         
@@ -122,7 +125,9 @@ extension SecondViewController: MKMapViewDelegate {
         if selected == 0 {
             let polylineRender = GradientPolylineRenderer(overlay: overlay)
             polylineRender.lineWidth = 10
-            polylineRender.lineJoin = CGLineJoin.round
+            polylineRender.lineJoin = .round
+            polylineRender.miterLimit = 10
+            polylineRender.lineCap = .round
             return polylineRender
         }
         

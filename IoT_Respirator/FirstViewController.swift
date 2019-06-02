@@ -34,7 +34,7 @@ class FirstViewController: UIViewController, CLLocationManagerDelegate {
         locationManager.requestWhenInUseAuthorization()
         if CLLocationManager.locationServicesEnabled() {
             locationManager.delegate = self
-            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters 
+            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
             locationManager.startUpdatingLocation()
         }
         
@@ -70,7 +70,7 @@ class FirstViewController: UIViewController, CLLocationManagerDelegate {
                 self.updateParticulates()
                 self.updateTotalVOCs()
                 self.updateCO2()
-                // update NOx and CO
+                self.updateRawCoNox()
                 self.updateRawVOC()
                 print("Estimated AQI Value: \(String(describing: addition?.airQualityEstimate))")
                 
@@ -174,7 +174,7 @@ class FirstViewController: UIViewController, CLLocationManagerDelegate {
         }
         
         // Form the data into a data set
-        let co2Line = LineChartDataSet(entries: co2, label: "Total VOC ppb")
+        let co2Line = LineChartDataSet(entries: co2, label: "Total CO2 ppm")
         co2Line.colors = [UIColor.blue]
         
         // Disable the circles
@@ -208,8 +208,8 @@ class FirstViewController: UIViewController, CLLocationManagerDelegate {
         }
         
         // Form the data into a data set
-        let ethLine = LineChartDataSet(entries: eth, label: "PM2.5 in ug/m^3")
-        let h2Line = LineChartDataSet(entries: h2, label: "PM10 in ug/m^3")
+        let ethLine = LineChartDataSet(entries: eth, label: "Raw Ethanol Value")
+        let h2Line = LineChartDataSet(entries: h2, label: "Raw Hydrogen Value")
         ethLine.colors = [UIColor.blue]
         h2Line.colors = [UIColor.red]
         
@@ -228,6 +228,42 @@ class FirstViewController: UIViewController, CLLocationManagerDelegate {
         rawVOCChartView.rightAxis.enabled = false
         
         rawVOCChartView.chartDescription?.text = "Particulate Concentration"
+        
+    }
+    
+    private func updateRawCoNox(){
+        var co = [ChartDataEntry]()
+        var nox = [ChartDataEntry]()
+        
+        // Plot the pm2.5 and pm10 data in the chart
+        for i in 0..<GlobalArrays.globalData.count {
+            let value1 = ChartDataEntry(x: GlobalArrays.globalData[i].timeReceived, y: Double(GlobalArrays.globalData[i].carbonMonoxideRelative))
+            co.append(value1)
+            let value2 = ChartDataEntry(x: GlobalArrays.globalData[i].timeReceived, y: Double(GlobalArrays.globalData[i].nitrogenOxidesRelative))
+            nox.append(value2)
+        }
+        
+        // Form the data into a data set
+        let coLine = LineChartDataSet(entries: co, label: "Carbon Monoxide ADC Value")
+        let noxLine = LineChartDataSet(entries: nox, label: "Nitrogen Oxides ADC Value")
+        coLine.colors = [UIColor.blue]
+        noxLine.colors = [UIColor.red]
+        
+        // Disable the circles
+        coLine.drawCirclesEnabled = false
+        noxLine.drawCirclesEnabled = false
+        
+        let data = LineChartData()
+        data.addDataSet(coLine)
+        data.addDataSet(noxLine)
+        
+        data.setDrawValues(false)
+        
+        noxcoChartView.data = data
+        noxcoChartView.xAxis.labelPosition = .bottom
+        noxcoChartView.rightAxis.enabled = false
+        
+        noxcoChartView.chartDescription?.text = "Raw Carbon Monoxide and Nitrogen Oxides"
         
     }
     
