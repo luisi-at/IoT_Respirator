@@ -16,6 +16,7 @@ struct GlobalArrays
     static var globalData: [ReadingPacket] = []
     static var startTime: Date!
     static var currentLocation: CLLocationCoordinate2D!
+    static var webData: [WebPacket] = []
 }
 
 class FirstViewController: UIViewController, CLLocationManagerDelegate {
@@ -66,8 +67,18 @@ class FirstViewController: UIViewController, CLLocationManagerDelegate {
             if let jsonContainer = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
                 let addition = ReadingPacket(json: jsonContainer, jsonString: rxString)
                 GlobalArrays.globalData.append(addition!)
+                
                 // Probably a better way to do this without Notifications to avoid resource contention, but I'm going with what I know
                 NotificationCenter.default.post(name: .didUpdateGlobalArray, object: nil, userInfo: nil) // Notify the other view data is available
+                
+                // Create the packet to push to the web API
+                let webAddition = WebPacket(aqi: (addition?.airQualityEstimate)!, lat: Double((addition?.mapKitCoordinate!.latitude)!),
+                                            lng: Double((addition?.mapKitCoordinate!.longitude)!))
+                GlobalArrays.webData.append(webAddition)
+                
+                // Push the data to the server
+                postData(packet: webAddition)
+                
                 self.updateParticulates()
                 self.updateTotalVOCs()
                 self.updateCO2()
@@ -81,13 +92,6 @@ class FirstViewController: UIViewController, CLLocationManagerDelegate {
             print(error.localizedDescription)
         }
         
-        //let jsonContainer = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-        //let addition = ReadingPacket(json: jsonContainer, jsonString: rxString)
-        
-        // Add the latest data to the array
-        //GlobalArrays.globalData.append(addition!)
-        //self.updateChart()
-        
     }
     
     // Get the current location of the user for use if the GPS drops/fails
@@ -96,9 +100,45 @@ class FirstViewController: UIViewController, CLLocationManagerDelegate {
         GlobalArrays.currentLocation = locationValue
     }
     
+    // POST the data to the webserver
+    func postData(packet: WebPacket) {
+        // Make an encoder
+        let jsonEncoder = JSONEncoder()
+        do {
+            let jsonData = try jsonEncoder.encode(packet)
+            let jsonString = String(data: jsonData, encoding: .utf8)
+            // Make the http POST request here
+            
+            var urlComponents = URLComponents()
+            urlComponents.scheme = "http"
+            urlComponents.host = "192.168.1.206" // This only works on the local network! Will need to change to the AWS instance when 'on the move'
+            urlComponents.port = 5000
+            urlComponents.path = "/data"
+            let url = urlComponents.url!
+            // Make this URL a request
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            // Insert the request into the body
+            request.httpBody = jsonData
+            
+            // POST the data and look at the reponse
+            let task = URLSession.shared.dataTask(with: request) { (data, response, error ) in
+                // Really just need to post here
+                // Let the other view handle any issues
+                print(response!)
+            }
+            task.resume()
+            
+        }
+        catch let error {
+            print(error.localizedDescription)
+        }
+        
+        
+    }
     
-    // Chart updates
     
+    // Update the charts
     private func updateParticulates(){
         var pm25 = [ChartDataEntry]()
         var pm10 = [ChartDataEntry]()

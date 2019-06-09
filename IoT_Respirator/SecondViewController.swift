@@ -10,6 +10,11 @@ import UIKit
 import MapKit
 import NotificationCenter // raise an event when the array has been added to
 
+// Array to hold the array from the response
+struct DataFromAPI {
+    static var apiArray: [WebPacket] = []
+}
+
 class SecondViewController: UIViewController {
 
     var selected: UInt8 = 0
@@ -28,6 +33,8 @@ class SecondViewController: UIViewController {
         mapView.setRegion(viewRegion, animated: true)
         mapView.showsUserLocation = true
         
+
+        
     }
 
     
@@ -38,17 +45,17 @@ class SecondViewController: UIViewController {
         
         // Extract the data here from the global array
         // TODO- call the map update routine
-        mapView.removeOverlays(mapView.overlays)
+        
         
         switch selected {
         case 0:
             // Draw the gradient of the AQI
-            
+            mapView.removeOverlays(mapView.overlays)
             addPollutionOnMapView()
             
         case 1:
             // Draw the route taken
-           
+            mapView.removeOverlays(mapView.overlays)
             addRouteOnMapView()
         default:
             break;
@@ -62,13 +69,22 @@ class SecondViewController: UIViewController {
         
         switch sender.selectedSegmentIndex {
         case 0:
+            mapView.removeOverlays(mapView.overlays)
             mapView.mapType = .standard
             selected = 0
             //addPollutionOnMapView()
         case 1:
+            mapView.removeOverlays(mapView.overlays)
             mapView.mapType = .hybrid
             selected = 1
             //addRouteOnMapView()
+        case 2:
+            mapView.removeOverlays(mapView.overlays)
+            mapView.mapType = .standard
+            selected = 2
+            getPollutionHistory()
+            // Pull in the web data in the corresponding function call
+            // Use this for the route history
         default:
             mapView.mapType = .standard
         }
@@ -106,6 +122,7 @@ class SecondViewController: UIViewController {
         mapView.addOverlay(pollutionPolyline)
     }
     
+    // For showing the AQI shading key
     func fillColorViewer() {
         gradientLayer = CAGradientLayer()
         
@@ -113,6 +130,72 @@ class SecondViewController: UIViewController {
         gradientLayer.colors = [UIColor.red.cgColor, UIColor.yellow.cgColor, UIColor.green.cgColor]
         
         colorViewer.layer.addSublayer(gradientLayer)
+        
+    }
+    
+    func getPollutionHistory() {
+        var coordinatesList: [CLLocationCoordinate2D] = []
+        //var webModel: [WebPacket] = []
+        
+        var urlComponents = URLComponents()
+        urlComponents.scheme = "http"
+        urlComponents.host = "192.168.1.206" // This only works on the local network! Will need to change to the AWS instance when 'on the move'
+        urlComponents.port = 5000
+        urlComponents.path = "/data"
+        let url = urlComponents.url!
+        // Make this URL a request
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        
+        // GET the data and look at the reponse
+        let task = URLSession.shared.dataTask(with: request) { (data, response, error ) -> Void in
+            // Let the other view handle
+            
+            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+                // Show an error message if the data is not able to be retrieved
+                let alert = UIAlertController(title: "Unable to get Pollution History", message: "The server could not find your pollution data", preferredStyle: .alert)
+                alert.addAction((UIAlertAction(title: "OK", style: .cancel, handler: nil)))
+                // Present the alert
+                self.present(alert, animated: true)
+                return
+            }
+ 
+            // The response contains the data, deserialize into an array of pollution indices
+            // using the Codable Protocol
+            print(String(data: data!, encoding: .utf8)!)
+            
+            do {
+                let decoder = JSONDecoder()
+                let webModel = try decoder.decode([WebPacket].self, from: data!)
+                DataFromAPI.apiArray = webModel
+            } catch let error {
+                print(error.localizedDescription)
+            }
+            
+            //print(response!)
+            
+        }
+        task.resume()
+ 
+        
+        // Check if the array has some points
+        if !DataFromAPI.apiArray.isEmpty {
+            // Get the coordinates for the map
+            for i in 0..<DataFromAPI.apiArray.count {
+                let coord = CLLocationCoordinate2D(latitude: CLLocationDegrees(DataFromAPI.apiArray[i].latitude), longitude: DataFromAPI.apiArray[i].longitude)
+                coordinatesList.append(coord)
+            }
+            
+            let pollutionPolyline = GradientPolyline(locations: coordinatesList, readings: DataFromAPI.apiArray)
+            mapView.addOverlay(pollutionPolyline)
+            
+        } else {
+            // Don't shade the map if there's nothing the shade
+            return
+        }
+        
+        
         
     }
     
@@ -124,6 +207,17 @@ extension SecondViewController: MKMapViewDelegate {
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         
         // Checks for the route view
+        
+        // Check for the gradient view for the pollution real time and pollution history
+        if selected == 0 || selected == 2 {
+            let polylineRender = GradientPolylineRenderer(overlay: overlay)
+            polylineRender.lineWidth = 15
+            polylineRender.lineJoin = .round
+            polylineRender.miterLimit = 10
+            polylineRender.lineCap = .round
+            return polylineRender
+        }
+        
         if selected == 1 {
             let lineView = MKPolylineRenderer(overlay: overlay)
             lineView.strokeColor = UIColor.blue
@@ -134,8 +228,7 @@ extension SecondViewController: MKMapViewDelegate {
             return lineView
         }
         
-        // Check for the gradient view
-        if selected == 0 {
+        if selected == 0 || selected == 2 {
             let polylineRender = GradientPolylineRenderer(overlay: overlay)
             polylineRender.lineWidth = 15
             polylineRender.lineJoin = .round
@@ -143,6 +236,16 @@ extension SecondViewController: MKMapViewDelegate {
             polylineRender.lineCap = .round
             return polylineRender
         }
+        
+        if selected == 2 {
+            let polylineRender = GradientPolylineRenderer(overlay: overlay)
+            polylineRender.lineWidth = 15
+            polylineRender.lineJoin = .round
+            polylineRender.miterLimit = 10
+            polylineRender.lineCap = .round
+            return polylineRender
+        }
+        
         
         return MKOverlayRenderer()
     }

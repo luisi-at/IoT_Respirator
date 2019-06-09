@@ -9,9 +9,21 @@
 import Foundation
 import MapKit
 
-
-struct AQITable {
+// MARK
+// Used for the REST API project extension
+// Want a lightweight version of the main structure since
+// the AQI is the main source used for the map shading
+struct WebPacket : Codable {
     
+    let airQualityEstimate:Int
+    let latitude: Double
+    let longitude: Double
+    
+    init(aqi: Int, lat: Double, lng: Double) {
+        self.airQualityEstimate = aqi
+        self.latitude = lat
+        self.longitude = lng
+    }
 }
 
 // The class to hold each of the readings from the board
@@ -95,7 +107,7 @@ extension ReadingPacket {
         aqiArray.append(pm10AQI)
         
         aqiArray.sort(by: >) // Sort in descending order to get the maximum value
-        
+        // This is the max value
         self.airQualityEstimate = aqiArray[0]
 
     }
