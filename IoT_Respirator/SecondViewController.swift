@@ -33,8 +33,8 @@ class SecondViewController: UIViewController {
         mapView.setRegion(viewRegion, animated: true)
         mapView.showsUserLocation = true
         
+        selected = 0
 
-        
     }
 
     
@@ -141,7 +141,16 @@ class SecondViewController: UIViewController {
         urlComponents.scheme = "http"
         urlComponents.host = "192.168.1.206" // This only works on the local network! Will need to change to the AWS instance when 'on the move'
         urlComponents.port = 5000
-        urlComponents.path = "/data"
+        
+        // Get the formatter for the date
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        // Form yesterday's date as a test for proof of concept:
+        var dateComponents = DateComponents()
+        dateComponents.setValue(-1, for: .day)
+        let yesterday = Calendar.current.date(byAdding: dateComponents, to: Date())!
+        urlComponents.path = "/data/" + formatter.string(from: yesterday)
+        
         let url = urlComponents.url!
         // Make this URL a request
         var request = URLRequest(url: url)

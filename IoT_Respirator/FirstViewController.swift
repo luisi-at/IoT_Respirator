@@ -104,6 +104,7 @@ class FirstViewController: UIViewController, CLLocationManagerDelegate {
     func postData(packet: WebPacket) {
         // Make an encoder
         let jsonEncoder = JSONEncoder()
+        // Don't need to encode the date to the ISO standard used in servers as already a string
         do {
             let jsonData = try jsonEncoder.encode(packet)
             let jsonString = String(data: jsonData, encoding: .utf8)

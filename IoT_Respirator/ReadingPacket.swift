@@ -18,11 +18,16 @@ struct WebPacket : Codable {
     let airQualityEstimate:Int
     let latitude: Double
     let longitude: Double
+    let dateTaken: String
     
     init(aqi: Int, lat: Double, lng: Double) {
         self.airQualityEstimate = aqi
         self.latitude = lat
         self.longitude = lng
+        // Get the current time and convert to string for the
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        self.dateTaken = formatter.string(from: Date())
     }
 }
 
