@@ -107,6 +107,7 @@ class FirstViewController: UIViewController, CLLocationManagerDelegate {
         do {
             let jsonData = try jsonEncoder.encode(packet)
             let jsonString = String(data: jsonData, encoding: .utf8)
+            print(jsonString!)
             // Make the http POST request here
             
             var urlComponents = URLComponents()
@@ -118,6 +119,8 @@ class FirstViewController: UIViewController, CLLocationManagerDelegate {
             // Make this URL a request
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
+            // Set the content type otherwise the API won't be able to accept it
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
             // Insert the request into the body
             request.httpBody = jsonData
             
@@ -125,7 +128,9 @@ class FirstViewController: UIViewController, CLLocationManagerDelegate {
             let task = URLSession.shared.dataTask(with: request) { (data, response, error ) in
                 // Really just need to post here
                 // Let the other view handle any issues
-                print(response!)
+                if let error = error {
+                    print(error)
+                }
             }
             task.resume()
             
